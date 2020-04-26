@@ -37,7 +37,7 @@ int main(int argc, const char **argv){
 
 
     double period, gamma, base, noise, initial;
-    
+    unsigned int count;
     try {
         json jsn = json::parse(str);
 	period = jsn["period"];
@@ -45,6 +45,7 @@ int main(int argc, const char **argv){
 	base = jsn["base"];
 	noise = jsn["noise"];
 	initial = jsn["initial"];
+	count = static_cast<unsigned int>(jsn["count"]);
     } catch (json::exception &ex) {
         cerr << "failed to parse json from file: " << path << " (" << ex.what() << ")" << endl;
         exit(1);
@@ -55,10 +56,8 @@ int main(int argc, const char **argv){
     worb.setPeriod(static_cast<unsigned int>(period));
     worb.setGamma(gamma);
 
-    int n = 100;
-
     cout << "output = [ " << endl;
-    for (int i=0; i<n; ++i) {
+    for (int i=0; i<count; ++i) {
 	std::cout << worb.next() << ", ";
     }
     cout << endl << "]" << endl;

@@ -3,5 +3,6 @@
     "gamma": 0,
     "base": 4,
     "noise": 0.13,
-    "initial": 0.2
+    "initial": 0.2,
+    "count": 1000
 }
