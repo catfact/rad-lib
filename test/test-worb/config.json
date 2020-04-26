@@ -1,0 +1,7 @@
+{
+    "period":3,
+    "gamma": 0,
+    "base": 4,
+    "noise": 0.13,
+    "initial": 0.2
+}
