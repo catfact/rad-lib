@@ -6,7 +6,6 @@
 #include "json.hpp"
 #include "worb.h"
 
-
 using nlohmann::json;
 
 using std::string;
@@ -53,6 +52,7 @@ int main(int argc, const char **argv){
 
     rad::Worb worb;
     worb.init(initial, base, noise);
+
     worb.setPeriod(static_cast<unsigned int>(period));
     worb.setGamma(gamma);
 

@@ -53,13 +53,14 @@ class Worb : public Generator
 
   static float rand1()
   {
-    return static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX / 2) - 1.f;
+      return static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
   }
 
   // map function (noisy logistic)
   double fn(double x)
   {
-    return ((base - noise) + noise * rand1()) * x * (1 - x);
+    float y = ((base - noise) + noise * rand1()) * x * (1 - x);
+    return y;
   }
 
   //
@@ -113,12 +114,9 @@ public:
     }
   }
 
-  Worb()
-  {
-    init(0.2, 4.0, 0);
-    setGamma(0.038);
-    setPeriod(2);
-  }
+  double* getBuffer() { return buf; }
+
+  Worb(){}
 };
 
 }
