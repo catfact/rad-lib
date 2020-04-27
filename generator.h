@@ -45,36 +45,15 @@ public:
     interps[Interpolator::Slew] = &interpSlew;
     interps[Interpolator::Smooth] = &interpSmooth;
     interps[Interpolator::Decay] = &interpDecay;
+    interp = &interpHold;
   }
 
   void setInterpType(Interpolator::Type t) {
     Interpolator *newInterp;
-    switch (t) {
-    case Interpolator::Hold:
-      newInterp = &interpHold;
-      break;
-    case Interpolator::Ramp:
-      newInterp = &interpRamp;
-      break;
-    case Interpolator::Cube:
-      newInterp = &interpCube;
-      break;
-    case Interpolator::Sine:
-      newInterp = &interpSine;
-      break;
-    case Interpolator::Slew:
-      newInterp = &interpSlew;
-      break;
-    case Interpolator::Smooth:
-      newInterp = &interpSmooth;
-      break;
-    case Interpolator::Decay:
-      newInterp = &interpDecay;
-      break;
-    default:
-      newInterp = &interpHold;
+    newInterp = interps[t];
+    if (interp != nullptr) {
+      newInterp->copyState(interp);
     }
-    newInterp->copyState(interp);
     interp = newInterp;
   }
 
@@ -89,10 +68,28 @@ public:
       buf[i] += interp->update();
     }
   }
+    
+
+    float processSample() {
+        phase += inc;
+        while (phase > 1.0) {
+          update();
+          phase -= 1.0;
+        }
+        return interp->update();
+    }
 
   void setRate(float rate_hz, float sr_hz) {
     sr = sr_hz;
     setRate(rate_hz);
+  }
+
+  void setSampleRate(float sr_hz) {
+    sr = sr_hz;
+    setRate(rate, sr);
+    for (int i=0; i<Interpolator::NumInterpTypes; ++i) { 
+      interps[i]->setSampleRate(sr);
+    }
   }
 
   void setInterpSpeed(float r) {

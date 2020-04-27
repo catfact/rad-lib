@@ -46,6 +46,12 @@ public:
     inc = (double)rate / (double)sr;
   }
 
+  // set the expected update rate in hz
+  virtual void setSampleRate(float sr_hz) {
+    sr = sr_hz;
+    setRate(rate, sr);
+  }
+
   // return current value, increment phase
   virtual float update() {
     double z = calc();

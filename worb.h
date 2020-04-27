@@ -39,8 +39,8 @@ class Worb : public Generator
   // history length; limits max period
   // FIXME: it would be smarter to only store [order] history values,
   // and wait to store them as appropriate...
-  static constexpr unsigned int bufSize = 256;
-  static constexpr unsigned int bufMask = 255;
+  static constexpr unsigned int bufSize = 32;
+  static constexpr unsigned int bufMask = 31;
   double buf[bufSize];
   unsigned int bufIx;
 
@@ -87,6 +87,18 @@ public:
     g = g_;
   }
 
+
+  void setBase(double b)
+  {
+    base = b;
+  }
+
+
+  void setNoise(double n)
+  {
+    noise = n;
+  }
+
   double next()
   {
     unsigned int d0 = 0;
@@ -110,6 +122,11 @@ public:
   {
     base = base_;
     noise = noise_;
+    reset(x_);
+
+  }
+
+  void reset(double x_) { 
     double x = x_;
     for (int i = 0; i < bufSize; ++i)
     {
@@ -119,9 +136,18 @@ public:
     }
   }
 
+  void randomize() { 
+    for (int i = 0; i < bufSize; ++i)
+    {
+      buf[i] = rand1();
+    }
+  }
+
   double* getBuffer() { return buf; }
 
-  Worb(): randDist(0.f, 1.f) {}
+  Worb(): randDist(0.f, 1.f) {
+      setInterpType(Interpolator::Sine);
+  }
 };
 
 }
