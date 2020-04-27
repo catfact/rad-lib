@@ -9,12 +9,12 @@
 // this class implements a 1-D iterated map,
 // modified by the addition of an FIR in its feedback path
 
-//
 #ifndef RAD_WORB_H
 #define RAD_WORB_H
 
 #include <cstdlib>
 #include <iostream>
+#include <random>
 
 #include "generator.h"
 
@@ -24,6 +24,11 @@ class Worb : public Generator
 {
   static constexpr int N = 2; // order of FIR
   static constexpr double rN = 1.0 / (double)N;
+
+
+  std::default_random_engine randGen;
+  std::uniform_real_distribution<float> randDist;
+
   int p;        // period
   double g;     // gamma parameter
   double noise; // noise amplitude
@@ -51,9 +56,9 @@ class Worb : public Generator
     buf[bufIx] = x;
   }
 
-  static float rand1()
+  float rand1()
   {
-      return static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+      return randDist(randGen);
   }
 
   // map function (noisy logistic)
@@ -116,7 +121,7 @@ public:
 
   double* getBuffer() { return buf; }
 
-  Worb(){}
+  Worb(): randDist(0.f, 1.f) {}
 };
 
 }
