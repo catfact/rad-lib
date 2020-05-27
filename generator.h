@@ -35,6 +35,9 @@ protected:
   //-- arbitrary numerical index of this osc
   int id;
 
+private:
+  virtual double next() = 0;
+
 public:
   Generator() {
     interpSpeed = 1.f;
@@ -57,27 +60,20 @@ public:
     interp = newInterp;
   }
 
-
   void process(int numFrames, float *buf) {
     for (int i = 0; i < numFrames; ++i) {
-      phase += inc;
-      while (phase > 1.0) {
-        update();
-        phase -= 1.0;
-      }
-      buf[i] += interp->update();
+      buf[i] += processSample();
     }
   }
-    
 
-    float processSample() {
-        phase += inc;
-        while (phase > 1.0) {
-          update();
-          phase -= 1.0;
-        }
-        return interp->update();
+  float processSample() {
+    phase += inc;
+    while (phase > 1.0) {
+      interp->push(this->next());
+      phase -= 1.0;
     }
+    return interp->update();
+  }
 
   void setRate(float rate_hz, float sr_hz) {
     sr = sr_hz;
@@ -87,7 +83,7 @@ public:
   void setSampleRate(float sr_hz) {
     sr = sr_hz;
     setRate(rate, sr);
-    for (int i=0; i<Interpolator::NumInterpTypes; ++i) { 
+    for (int i = 0; i < Interpolator::NumInterpTypes; ++i) {
       interps[i]->setSampleRate(sr);
     }
   }
@@ -102,12 +98,9 @@ public:
     inc = rate / sr;
     interp->setRate(rate_hz * interpSpeed, sr);
   }
-private:
-  virtual void update() = 0;
 
 };
 
-
-}
+} // namespace rad
 
 #endif // RAD_GENERATOR_HPP

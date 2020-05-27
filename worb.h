@@ -23,8 +23,6 @@ namespace rad {
 class Worb : public Generator
 {
   static constexpr int N = 2; // order of FIR
-  static constexpr double rN = 1.0 / (double)N;
-
 
   std::default_random_engine randGen;
   std::uniform_real_distribution<float> randDist;
@@ -68,11 +66,25 @@ class Worb : public Generator
     return y;
   }
 
-  //
-  virtual void update() override
+  virtual double next() override
   {
-    Generator::interp->push(this->next());
+    unsigned int d0 = 0;
+    unsigned int d1 = p;
+    unsigned int d2 = p - 1;
+    unsigned int d3 = 2 * p - 1;
+
+    const double x0 = peek(d0);
+    const double x1 = peek(d1);
+    const double x2 = peek(d2);
+    const double x3 = peek(d3);
+
+    double y = (1.f - g) * (a[0] * fn(x0) + a[1] * fn(x1)) + g * (x2 + x3) / static_cast<double>(N);
+
+    poke(y);
+
+    return y;
   }
+
 
 public:
   void setPeriod(unsigned int p_)
@@ -97,25 +109,6 @@ public:
   void setNoise(double n)
   {
     noise = n;
-  }
-
-  double next()
-  {
-    unsigned int d0 = 0;
-    unsigned int d1 = p;
-    unsigned int d2 = p - 1;
-    unsigned int d3 = 2 * p - 1;
-
-    const double x0 = peek(d0);
-    const double x1 = peek(d1);
-    const double x2 = peek(d2);
-    const double x3 = peek(d3);
-
-    double y = (1.f - g) * (a[0] * fn(x0) + a[1] * fn(x1)) + g * (x2 + x3) / static_cast<double>(N);
-
-    poke(y);
-
-    return y;
   }
 
   void init(double x_, double base_, double noise_)
@@ -148,6 +141,7 @@ public:
   Worb(): randDist(0.f, 1.f) {
       setInterpType(Interpolator::Sine);
   }
+
 };
 
 }
